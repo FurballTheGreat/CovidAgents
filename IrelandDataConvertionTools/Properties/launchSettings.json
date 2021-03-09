@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IrelandDataConversionTools": {
+      "commandName": "Project",
+      "commandLineArgs": "shapefile convertpopdist CensusPopulationByAge.csv census2016.popdistbyage 2016"
+    }
+  }
+}

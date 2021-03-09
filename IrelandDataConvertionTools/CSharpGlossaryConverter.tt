@@ -1,0 +1,74 @@
+﻿<#@ template language="C#" linePragmas="false"  #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="IrelandDataConversionTools" #>
+<#@ parameter type="System.Collections.Generic.List<IrelandDataConversionTools.GlossaryTheme>" name="Themes" #>
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+
+namespace IrelandDataConversionTools
+{
+    class ShapeFileConverter
+    {
+        public static void ConvertShapeFile(string pJson, Stream pOutput) {
+            using var doc = JsonDocument.Parse(pJson);
+            using var writer = new BinaryWriter(pOutput);
+            var feautresEl = doc.RootElement.EnumerateObject().FirstOrDefault(pX=>pX.Name=="features");
+            var allPropNames = new List<string>();
+            foreach (var featureEl in feautresEl.Value.EnumerateArray())
+            {
+                var property = featureEl.EnumerateObject().FirstOrDefault(pX=>pX.Name=="properties");
+
+                var allProps = property.Value.EnumerateObject().ToDictionary(pX=>pX.Name, pX=>pX.Value);
+<#
+   foreach(var theme in Themes) { 
+        foreach(var col in theme.Columns) {
+#>
+                writer.Write(allProps.ContainsKey("<#=  col.Name #>") ? Int32.Parse(allProps["<#=  col.Name #>"].ToString()) : 0);
+<#        } 
+} #>   
+                var gemoetricEl = featureEl.EnumerateObject().FirstOrDefault(pX => pX.Name == "geometry");
+                var geoType = gemoetricEl.Value.EnumerateObject().FirstOrDefault(pX => pX.Name == "type").Value
+                    .ToString();
+                var cordsEl = gemoetricEl.Value.EnumerateObject().FirstOrDefault(pX => pX.Name == "coordinates");
+                var cordsArr = cordsEl.Value.EnumerateArray().ToArray()[0].EnumerateArray().ToArray();
+
+                var count = cordsArr.Length;
+                writer.Write((Int32) count);
+                if (geoType == "Polygon")
+                {
+                    writer.Write(1);
+                    foreach (var coordEl in cordsArr)
+                    {
+                        Console.WriteLine($"{coordEl}");
+                        foreach (var val in coordEl.EnumerateArray())
+                        {
+                            var v = val.ToString();
+                            writer.Write(double.Parse(v));
+                        }
+                    }
+                } else if (geoType == "MultiPolygon")
+                {
+                    writer.Write(cordsArr.Length);
+                    foreach (var coordEl in cordsArr)
+                    {
+                        Console.WriteLine($"{coordEl}");
+                        foreach (var val in coordEl.EnumerateArray())
+                        {
+                            foreach (var v2 in val.EnumerateArray())
+                            {
+                                var v = v2.ToString();
+                                writer.Write(double.Parse(v));
+                            }
+                        }
+                    }
+                }
+            }
+           
+        }
+    }
+}

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>iedataconv</AssemblyName>
+    <RootNamespace>IrelandDataConversionTools</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="CSharpGlossaryConverter.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CSharpGlossaryConverter.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CensusPopulationByAge.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="CppHeaderGlossary.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>CppHeaderGlossary.cs</LastGenOutput>
+    </None>
+    <None Update="CSharpGlossaryConverter.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>CSharpGlossaryConverter.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="CppHeaderGlossary.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CppHeaderGlossary.tt</DependentUpon>
+    </Compile>
+    <Compile Update="CSharpGlossaryConverter.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CSharpGlossaryConverter.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

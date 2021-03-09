@@ -1,0 +1,32 @@
+﻿<#@ template language="C#" linePragmas="false" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="IrelandDataConversionTools" #>
+<#@ parameter type="System.Collections.Generic.List<IrelandDataConversionTools.GlossaryTheme>" name="Themes" #>
+#pragma once
+
+#include "Common.h"
+
+<#
+   foreach(var theme in Themes) { 
+#>
+typedef struct {
+<#
+        foreach(var col in theme.Columns) {
+#>
+   DWORD <#= col.StructName #>;
+<#      } 
+#>} Theme<#= theme.StructName #>;
+
+<# } #>    
+
+typedef struct {
+<#
+   foreach(var theme in Themes) { 
+#>
+    Theme<#= theme.StructName #> <#= theme.StructName #>;
+<# } 
+#>} SmallPopulationAreaDefinition;
+
+  
