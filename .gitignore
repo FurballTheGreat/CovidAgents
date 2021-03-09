@@ -31,3 +31,6 @@ SharedLib.vcxproj.user
 /PopulationSimulationLib/*.user
 cmake_install.cmake
 *.user
+/.vs
+/out/build
+/packages

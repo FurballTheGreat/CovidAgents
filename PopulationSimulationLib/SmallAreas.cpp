@@ -23,6 +23,7 @@
 #include "Exceptions.h"
 #include "Household.h"
 #include "Person.h"
+#include "VectorTaskThreader.h"
 
 #define MAGIC 0xBAADBE1F
 
@@ -100,43 +101,23 @@ SmallAreas::SmallAreas(const std::string pFileName)
 
 void SmallAreas::BuildPeople(RandomSource* pRandom, Population* pPopulation, boost::gregorian::date pCurrentDate, std::vector<Person*>* pFloatingPeople)
 {
-	auto processor_count = std::thread::hardware_concurrency() / 2;
-	if (processor_count == 0) processor_count = 1;
-	auto numPerThread = _areas.size() / processor_count;
-	auto size = _areas.size();
-	auto areas = _areas;
-	auto floating = std::vector<std::vector<Person*>*>();
-	
-	auto f = [numPerThread, size, areas, pRandom, pPopulation, pCurrentDate, &floating, processor_count](DWORD j) {
-		auto min = (DWORD)(j * numPerThread);
-		auto max = j == processor_count - 1 ? size  : min + numPerThread;
-		auto random = RandomSource();
-		std::string msg = "\r\nThread=" + std::to_string(j) + " Range=" +std::to_string(min) + "-" + std::to_string(max)+ " floatingsize="+ std::to_string(floating[j]->size())+"\r\n";
-		std::cout << msg;
-		for (DWORD i = min; i < max; i++) {
-			/*if (areas[i]->GetId() % 1000 == 0)
-				std::cout << areas[i]->GetId() << "\r\n";*/
-			areas[i]->BuildPeople(&random, pPopulation, pCurrentDate, floating[j]);
-		}
-	};
-
-	auto threads = std::vector<std::thread*>();
-	for (DWORD n = 0; n < processor_count; n++) {
-		floating.push_back(new std::vector<Person*>());
-		threads.push_back(new std::thread(f, n));
-	}
-
-	for (DWORD n = 0; n < processor_count; n++)
-	{
-		threads[n]->join();
-		for (auto* person : *floating[n])
-			pFloatingPeople->push_back(person);
-		delete threads[n];
-		delete floating[n];
-		
-	}
-	std::cout << pFloatingPeople->size() << "\r\n";
-
+	VectorTaskThreader().Process<std::vector<SmallArea*>, std::vector<Person*>>(
+		&_areas,
+		[&](std::vector<SmallArea*>* pItems, DWORD pMin, DWORD pMax, std::vector<Person*>* pResults)
+		{
+			RandomSource random;
+			std::string msg = "\r\n Range=" + std::to_string(pMin) + "-" + std::to_string(pMax) + " floatingsize=" + std::to_string(pResults->size()) + "\r\n";
+			std::cout << msg;
+			for (DWORD i = pMin; i < pMax; i++) {
+				_areas[i]->BuildPeople(&random, pPopulation, pCurrentDate, pResults);
+			}
+		},
+		[&](std::vector<std::vector<Person*>*>* pAllResults)
+		{
+			for(auto* threadResult : *pAllResults)
+				for (auto* person : *threadResult)
+					pFloatingPeople->push_back(person);
+		});
 }
 
 void SmallAreas::DistributeFloating(RandomSource* pRandom, std::vector<Person*>* pFloatingPeople)

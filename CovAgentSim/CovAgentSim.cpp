@@ -22,7 +22,9 @@
 #include "CommandProcessor.h"
 #include "CommandsGeneral.h"
 #include "CommandsCounty.h"
+#include "CommandsFileSystem.h"
 #include "CommandsLea.h"
+#include "CommandsSimulation.h"
 #include "Console.h"
 #include "County.h"
 #include "LocalElectoralArea.h"
@@ -82,7 +84,9 @@ int main(int argc, char** argv)
 	time_spent = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 	std::cout << "Built Population in " << time_spent << "s\r\n" << "Generated " << smallAreas.GetPopulationCount() << " people into "<<  smallAreas.GetHouseholdCount()  <<" households\r\n";
 	
-
+	SimpleInfectionSimulator simulation(popSim);
+	StandardVariant variant;
+	
 	auto console = Win32Console();
 	auto executionContext = ExecutionContext();
 	
@@ -92,12 +96,16 @@ int main(int argc, char** argv)
 		new SubRegionsCommand(&popSim),
 		new CountiesCommand(&popSim),
 		new CountyStatusCommand(&popSim),
-		new LocalElectoralAreasCommand(&popSim)
+		new LocalElectoralAreasCommand(&popSim),
+		new SimpleSimulationCommand(&popSim, &simulation),
+		new SeedCasesCommand(&popSim, &simulation, &variant),
+		new CdCommand(),
+		new PwdCommand()
 	};
 	auto cmdProc = CommandProcessor(&commands);
 
 	while (true) {
-		cout << ds << "> ";
+		cout << popSim.GetDate() << "> ";
 		auto line = console.ReadLine();
 		auto cmdLine = ParsedCommandLine(line, reinterpret_cast<IExecutionContext*>(&executionContext));
 		cmdProc.ProcessCommandLine(&console, &cmdLine);

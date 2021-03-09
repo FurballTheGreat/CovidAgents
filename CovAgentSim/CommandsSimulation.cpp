@@ -27,35 +27,40 @@
 #include "RandomSource.h"
 #include "SimpleInfectionSimulator.h"
 #include "SmallArea.h"
+#include "SmallAreas.h"
 #include "StandardVariant.h"
 
-SimpleSimulationCommand::SimpleSimulationCommand(PopulationSim* pSim) : _sim(pSim) {
+SimpleSimulationCommand::SimpleSimulationCommand(PopulationSim* pSim, SimpleInfectionSimulator* pSimulation) : _sim(pSim), _simulation(pSimulation) {
 }
 
 void SimpleSimulationCommand::ProcessCommand(Console* pConsole, ParsedCommandLine* pCmdLine)
 {
 	auto args = pCmdLine->GetArgs();
-	if (args.size() < 2)
-		return;
 
-	auto id = atoi(args[1].c_str());
-	if (id >= static_cast<int>(_sim->GetCounties()->size()))
-		return;
-
-	
-	
-	auto* area = (*_sim->GetCounties())[id];
-	auto areas = area->GetSmallAreas();
-	auto plotter2 = MapPlotter(&areas);
-	SimpleInfectionSimulator simulator(*_sim);
-
+	int days;
 	auto random = RandomSource();
-	auto variant = StandardVariant();
-	simulator.Seed(random, &variant, (*_sim->GetCounties())[6], 5);
-	for (DWORD day = 0; day < 365; day++)
+	
+
+	if(args.size()==2)
+	{
+		days = atoi(args[1].c_str());
+		if (days < 1) {
+			cout << "You must run at least one day\r\b";
+			return;
+		}
+	} else
+	{
+		pConsole->WriteLine("SYNTAX: simplesim days_to_run number_to_seed [countyNumber]");
+		return;
+	}
+	
+
+	auto plotter2 = MapPlotter(_sim->GetSmallAreas()->GetAreas());
+
+	for (DWORD day = 0; day < static_cast<DWORD>(days); day++)
 	{
 
-		std::string fileName = "c:\\personal\\" + std::to_string(day) + ".png";
+		std::string fileName = std::to_string(day) + ".png";
 
 		auto begin = clock();
 		plotter2.PlotMap(
@@ -94,14 +99,63 @@ void SimpleSimulationCommand::ProcessCommand(Console* pConsole, ParsedCommandLin
 		std::cout << "Saved " << fileName << " in " << time_spent << "s\r\n";
 
 		begin = clock();
-		simulator.ProceedDay(random, 0, 5, 0, 4);
+		_simulation->ProceedDay(random, 0, 5, 0, 4);
 		end = clock();
 		time_spent = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-		std::cout << _sim->GetDate() << " processed in " << time_spent << "s, a total of " << simulator.GetTotalCurrentlyInfected() << " people are currently infected \r\n";
+		std::cout << _sim->GetDate() << " processed in " << time_spent << "s, a total of " << _simulation->GetTotalCurrentlyInfected() << " people are currently infected \r\n";
 	}
 }
 
 CommandInfo SimpleSimulationCommand::GetInfo()
 {
 	return CommandInfo("simplesim", "", "Displays County Status");
+}
+
+
+SeedCasesCommand::SeedCasesCommand(PopulationSim* pSim, SimpleInfectionSimulator* pSimulation, Variant *pVariant) : _sim(pSim), _simulation(pSimulation), _variant(pVariant)
+{
+}
+
+void SeedCasesCommand::ProcessCommand(Console* pConsole, ParsedCommandLine* pCmdLine)
+{
+	auto args = pCmdLine->GetArgs();
+	
+	auto random = RandomSource();
+	
+	int numToSeed = 0;
+	int id = 0;
+	switch (args.size())
+	{
+	case 2:
+		numToSeed = atoi(args[1].c_str());
+		if (numToSeed < 1) {
+			cout << "You must seed at least one case\r\b";
+			return;
+		}
+		_simulation->Seed(random, _variant,  5);
+		break;
+	case 3:
+		id = atoi(args[2].c_str());
+		if (id >= static_cast<int>(_sim->GetCounties()->size())) {
+			cout << "Invalid County Index\r\b";
+			return;
+		}
+
+		numToSeed = atoi(args[1].c_str());
+		if (numToSeed < 1) {
+			cout << "You must seed at least one case\r\b";
+			return;
+		}
+
+		_simulation->Seed(random, _variant, (*_sim->GetCounties())[id], 5);
+		break;
+	default:
+		pConsole->WriteLine("SYNTAX: seed number_to_seed [countyNumber]");
+		break;
+	}
+}
+
+CommandInfo SeedCasesCommand::GetInfo()
+{
+	return CommandInfo("seed", "", "Seeds some new cases");
 }

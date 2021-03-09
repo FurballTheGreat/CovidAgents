@@ -22,7 +22,7 @@ Finally build the application itself.
 
     ./build-full
 
-## Visual Studio
+## Visual Studio 2019
 
 Clone the source code to the application and the Blend2d library using the following commands:
 
@@ -30,7 +30,7 @@ Clone the source code to the application and the Blend2d library using the follo
     cd blend2d
     git clone https://github.com/asmjit/asmjit
     git clone https://github.com/blend2d/blend2d
-    cd...
+    cd..
     git clone https://github.com/FurballTheGreat/CovidAgents.git
    
 Use the batch files provided to build the 64bit projects for Blend2d and asmjit. Build both using visual studio in  in Release & Debug x64 configurations.

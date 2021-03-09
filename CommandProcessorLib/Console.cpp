@@ -16,9 +16,8 @@
 #include "Console.h"
 #include <stdio.h>
 #include <stdarg.h>
-#include <wchar.h>
+#include <cwchar>
 #include <locale>
-
 #include <codecvt>
 
 bool Console::Write(std::string pString)

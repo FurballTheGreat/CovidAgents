@@ -15,14 +15,27 @@
 
 #pragma once
 #include "CommandProcessor.h"
+#include "SimpleInfectionSimulator.h"
 
 class PopulationSim;
 
 class SimpleSimulationCommand : public Command {
 private:
 	PopulationSim* _sim;
+	SimpleInfectionSimulator* _simulation;
 public:
-	SimpleSimulationCommand(PopulationSim* pSim);
+	SimpleSimulationCommand(PopulationSim* pSim, SimpleInfectionSimulator* pSimulation);
+	void ProcessCommand(Console* pConsole, ParsedCommandLine* pCmdLine);
+	CommandInfo GetInfo();
+};
+
+class SeedCasesCommand : public Command {
+private:
+	PopulationSim* _sim;
+	SimpleInfectionSimulator* _simulation;
+	Variant* _variant;
+public:
+	SeedCasesCommand(PopulationSim* pSim, SimpleInfectionSimulator* pSimulation, Variant* pVariant);
 	void ProcessCommand(Console* pConsole, ParsedCommandLine* pCmdLine);
 	CommandInfo GetInfo();
 };

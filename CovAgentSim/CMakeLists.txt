@@ -12,6 +12,8 @@ add_executable (
 	"CommandsCounty.h"
 	"CommandsLea.cpp" 
 	"CommandsLea.h"
+	"CommandsFileSystem.cpp" 
+	"CommandsFileSystem.h"
 	"CommandsSimulation.cpp" 
 	"CommandsSimulation.h"
 	"CovAgentSim.cpp" )
