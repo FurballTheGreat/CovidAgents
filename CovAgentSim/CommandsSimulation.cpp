@@ -16,7 +16,7 @@
 #include "CommandsSimulation.h"
 
 #include <iostream>
-#include <blend2d/rgba.h>
+#include <blend2d.h>
 #include "boost/date_time/gregorian/gregorian.hpp"
 
 
