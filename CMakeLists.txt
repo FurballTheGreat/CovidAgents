@@ -29,7 +29,7 @@ if (UNIX)
     set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
     find_package(GeographicLib REQUIRED)
     
-    find_package(Boost 1.66.0 REQUIRED COMPONENTS date_time)
+    find_package(Boost 1.66.0 REQUIRED COMPONENTS date_time filesystem)
     include_directories(${Boost_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS}) 
     include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/blend2d/blend2d/src")
     link_directories (${Boost_LIBRARY_DIRS} ${GeographicLib_LIBRARIES} ${PNG_LIBRARIES} "blend2d/blend2d/build")
