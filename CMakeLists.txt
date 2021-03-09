@@ -12,7 +12,7 @@ if (MSVC)
     include_directories ("../geographiclib-code/include")
     include_directories ("packages/libpng-v142.1.6.37.2/build/native/include")
 
-    include_directories(${WinSDK})
+    include_directories(${WinSDK} ${)
     link_directories ("packages/boost_date_time-vc142.1.72.0.0/lib/native")
     link_directories ("packages/libpng-v142.1.6.37.2/build/native/lib/x64/v142/Debug")
     link_directories ("../blend2d/blend2d/build_vs2019_x64/Debug")
@@ -31,7 +31,7 @@ if (UNIX)
     
     find_package(Boost 1.66.0 REQUIRED COMPONENTS date_time)
     include_directories(${Boost_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS}) 
-    include_directories ("../blend2d/blend2d/src")
+    include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/blend2d/blend2d/src")
     link_directories (${Boost_LIBRARY_DIRS} ${GeographicLib_LIBRARIES} ${PNG_LIBRARIES} "blend2d/blend2d/build")
 endif (UNIX)
 
