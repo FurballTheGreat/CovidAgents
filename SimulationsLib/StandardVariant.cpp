@@ -25,12 +25,12 @@ StandardVariant::StandardVariant()
 std::vector<double> StandardVariant::GetInfectiousnessByDay(RandomSource& pRandom)
 {
 	auto byDay = std::vector<double>();
-	auto length = pRandom.Get( 20)+4;
-	auto engine = std::default_random_engine(pRandom.Get<DWORD>());
+	auto length = pRandom.Get( 20)+8;
+	auto engine = std::default_random_engine(pRandom.Get<double>());
 
-	const std::gamma_distribution<>  distribution(1.813, 2.199);
+	const std::gamma_distribution<double>  distribution(1.813, 2.199);
 	
 	for(auto i = 0; i< length;i++)
-		byDay.push_back(distribution(engine));
+		byDay.push_back((double)distribution(engine));
 	return byDay;
 }
