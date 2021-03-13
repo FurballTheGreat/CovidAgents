@@ -29,7 +29,7 @@ if (UNIX)
     set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
     find_package(GeographicLib REQUIRED)
     find_package(Python3 REQUIRED)
-    find_package(Boost 1.66.0 REQUIRED COMPONENTS date_time filesystem)
+    find_package(Boost 1.66.0 REQUIRED COMPONENTS date_time filesystem python)
     
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
