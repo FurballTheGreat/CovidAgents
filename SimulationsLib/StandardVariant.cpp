@@ -31,7 +31,7 @@ std::vector<double> StandardVariant::GetInfectiousnessByDay(RandomSource& pRando
 	const std::gamma_distribution<>  distribution(1.813, 2.199);
 	
 	for (auto i = 0; i < length; i++) {
-		double val = distribution(engine);
+		double val = static_cast<double>(distribution(engine));
 		byDay.push_back(val);
 	}
 	return byDay;
