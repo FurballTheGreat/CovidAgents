@@ -6,7 +6,7 @@ A simulation engine for mapping disease transmission behaviors using a network &
 
 First you need to install the following packages. It is assumed you have a functional GCC/G++ environment already installed:
 
-    apt install libpng-dev cmake libgeographic-dev libboost-date-time-dev git
+    apt install libpng-dev cmake libgeographic-dev libboost-date-time-dev git pkg-config libavcodec-dev libavformat-dev libavfilter-dev libavresample-dev libavutil-dev libswscale-dev
 
 There are scripts included to simplify the build process each needs to be granted execute access.
 

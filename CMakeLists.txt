@@ -30,9 +30,20 @@ if (UNIX)
     find_package(GeographicLib REQUIRED)
     
     find_package(Boost 1.66.0 REQUIRED COMPONENTS date_time filesystem)
-    include_directories(${Boost_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS}) 
+    
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
+    libavfilter
+    libavformat
+    libavcodec
+    libswresample
+    libswscale
+    libavutil
+)
+
+    include_directories(${Boost_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS}) 
     include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/blend2d/blend2d/src")
-    link_directories (${Boost_LIBRARY_DIRS} ${GeographicLib_LIBRARIES} ${PNG_LIBRARIES} "blend2d/blend2d/build")
+    link_directories (${Boost_LIBRARY_DIRS} ${GeographicLib_LIBRARY_DIRS} ${PNG_LIBRARY_DIRS} "blend2d/blend2d/build")
 endif (UNIX)
 
 include_directories ("Common")

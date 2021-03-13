@@ -37,6 +37,7 @@ if (UNIX)
 	blend2d
 	pthread
 	${PNG_LIBRARIES}
+	${FFMPEG_LIBRARIES}
 	${GeographicLib_LIBRARIES}
 	SharedLib 
 	CommandProcessorLib 
