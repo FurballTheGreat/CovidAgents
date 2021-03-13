@@ -28,10 +28,10 @@ std::vector<double> StandardVariant::GetInfectiousnessByDay(RandomSource& pRando
 	auto length = pRandom.Get( 20)+8;
 	auto engine = std::mt19937(pRandom.Get<DWORD>());
 
-	const std::gamma_distribution<>  distribution(1.813, 2.199);
+	const std::gamma_distribution<double>  distribution(1.813, 2.199);
 	
 	for (auto i = 0; i < length; i++) {
-		double val = static_cast<double>(distribution(engine));
+		double val = distribution(engine);
 		byDay.push_back(val);
 	}
 	return byDay;
