@@ -69,7 +69,7 @@ void CountyStatusCommand::ProcessCommand(Console* pConsole, ParsedCommandLine* p
 	if (id >= static_cast<int>(_sim->GetCounties()->size()))
 		return;
 	
-	auto area = (*_sim->GetCounties())[id];
+	auto* area = (*_sim->GetCounties())[id];
 
 	wcout << "Name: " << area->GetName() << "\r\n";
 	wcout << "Region: " << area->GetRegion()->GetName() << "\r\n";

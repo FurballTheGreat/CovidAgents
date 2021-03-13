@@ -26,9 +26,6 @@
 #include "CommandsLea.h"
 #include "CommandsSimulation.h"
 #include "Console.h"
-#include "County.h"
-#include "LocalElectoralArea.h"
-#include "MapPlotter.h"
 #include "Win32Console.h"
 #include "PopulationSim.h"
 
@@ -37,8 +34,14 @@
 #include "StandardVariant.h"
 #include "Variant.h"
 
-using namespace boost::gregorian;
+#include <boost/python.hpp>
 
+
+#include "DrawingCanvas.h"
+#include "FFMpegH264Writer.h"
+
+using namespace boost::gregorian;
+using namespace boost::python;
 using namespace GeographicLib;
 
 
@@ -55,9 +58,32 @@ public:
 	void SetVariable(string pName, string pValue) {
 	}
 };
+BLRgba32 HSVtoRGB(float pHue, float pSaturation, float pBrightness);
 
 int main(int argc, char** argv)
 {
+	//auto canvas = DrawingCanvas(1920, 1080);
+	//auto  h264Writer = new FFMpegH264Writer("c:\\amd\\out.mp4", canvas.GetSize(), 30, 2000000);
+	//
+	//for (DWORD x = 0; x < 200; x++)
+	//{
+	//	canvas.Render([&](BLContext& pContext, BLPoint pOrigin, BLSize pSize)
+	//		{
+	//			BLRgba32 color = HSVtoRGB(355, 40+x/4, 60+ x / 8);
+	//			pContext.setFillStyle(color);
+	//			pContext.fillRect(pOrigin.x, pOrigin.y, pSize.w, pSize.h);
+	//		}
+	//	);
+	//	canvas.WriteTo(*h264Writer);
+	//	
+	//}
+	//
+	//delete(h264Writer);
+	//Py_Initialize();
+	//object main_module = import("__main__");
+	//object main_namespace = main_module.attr("__dict__");
+	//object ignored = exec("result = 5 ** 2", main_namespace);
+	//int five_squared = extract<int>(main_namespace["result"]);
     auto popDist = PopulationDistributionDefinition(argv[1]);
     auto smallAreas = SmallAreas(argv[2]);
 

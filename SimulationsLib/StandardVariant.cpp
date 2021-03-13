@@ -26,8 +26,9 @@ std::vector<double> StandardVariant::GetInfectiousnessByDay(RandomSource& pRando
 {
 	auto byDay = std::vector<double>();
 	auto length = pRandom.Get( 20)+4;
-	std::default_random_engine engine{};
-	std::gamma_distribution<>  distribution(1.813, 2.199);
+	auto engine = std::default_random_engine(pRandom.Get<DWORD>());
+
+	const std::gamma_distribution<>  distribution(1.813, 2.199);
 	
 	for(auto i = 0; i< length;i++)
 		byDay.push_back(distribution(engine));

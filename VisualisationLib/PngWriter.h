@@ -1,3 +1,5 @@
+#pragma once
+#include "ICanvasWriter.h"
 /*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -12,26 +14,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-#include <functional>
-#include <string>
-#include <vector>
-#include <blend2d.h>
-#include <boost/date_time/gregorian/greg_date.hpp>
-class DrawingFont;
-class SmallArea;
+#include <png.h>
 
-class MapPlotter
+class PngWriterException : public std::exception
 {
-private:
-	std::vector<SmallArea*>* _areas;
-    double _minNorthing = 0;
-	double _maxNorthing = 0;
-    double _minEasting = 0;
-	double _maxEasting = 0;
-public:
-	MapPlotter(std::vector<SmallArea*>* pAreas);
+};
 
-	void PlotMap(BLContext& pContext, BLPoint pOrigin, BLSize pSize, boost::gregorian::date pDate, std::function<void(SmallArea&, BLContext&)> pApplyAreaStyle) const;
+class PngWriter : public ICanvasWriter 
+{
+	FILE* _file = nullptr;
+	png_structp _png = nullptr;
+	png_infop _info = nullptr;
+	void CloseFileHandle();
+public:
+	PngWriter(const std::string& pFileName);
+	~PngWriter() override;
+	void SaveFrame(DWORD pLines, DWORD pStride, void* pLinePointers) override;
+	
 };
 

@@ -16,157 +16,70 @@
 #include "MapPlotter.h"
 
 #include <blend2d.h>
+#include <iostream>
 #include <GeographicLib/GeoCoords.hpp>
+
+#include "DrawingFont.h"
 #include "SmallArea.h"
-#include <png.h>
-
 #include "LocalElectoralArea.h"
-#include "Person.h"
 
-MapPlotter::MapPlotter(std::vector<SmallArea*>* pAreas): _areas(pAreas) {
+#define MIN_EASTING 340118
 
-    BLResult err = _fontData.createFromFile("Kosugi-Regular.ttf");
-    err = _fontFace.createFromData(_fontData,0);
-    _font.createFromFace(_fontFace, 30);
-}
-#ifdef __unix
-#define fopen_s(pFile,filename,mode) ((*(pFile))=fopen((filename),(mode)))==NULL
-#endif
-void write_png_file(char* filename, int pWidth, int pHeight, void **pDataPointers) {
-
-    FILE* fp;
-    fopen_s(&fp, filename, "wb");
-    if (!fp) abort();
-
-    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png) abort();
-
-    png_infop info = png_create_info_struct(png);
-    if (!info) abort();
-
-    if (setjmp(png_jmpbuf(png))) abort();
-
-    png_init_io(png, fp);
-
-    // Output is 8bit depth, RGBA format.
-    png_set_IHDR(
-        png,
-        info,
-        pWidth, pHeight,
-        8,
-        PNG_COLOR_TYPE_RGBA,
-        PNG_INTERLACE_NONE,
-        PNG_COMPRESSION_TYPE_DEFAULT,
-        PNG_FILTER_TYPE_DEFAULT
-    );
-    png_write_info(png, info);
-
-    png_write_image(png, (png_bytepp)pDataPointers);
-    png_write_end(png, NULL);
-
-    fclose(fp);
-
-    png_destroy_write_struct(&png, &info);
-}
-
-void MapPlotter::PlotMap(std::string pOutputFile, boost::gregorian::date pDate, std::function<void(SmallArea&, BLContext&)> pApplyAreaStyle)
+MapPlotter::MapPlotter(std::vector<SmallArea*>* pAreas): _areas(pAreas)
 {
-    double minNorthing = 0, maxNorthing = 0;
-    double minEasting = 0, maxEasting = 0;
-    DWORD last14dayinfectionRate = 0;
-    DWORD totalInfected = 0;
-    DWORD totalImmune = 0;
-    DWORD totalPopulation = 0;
-    for (SmallArea *area : (*_areas))
-    {
-    	for(auto *person: (*area->GetPeople()))
-    	{
-            totalPopulation++;
-            if (person->GetInfection() != nullptr)
-            {
-                totalInfected++;
-                if (person->GetInfection()->GetDaysInfected() <= 14)
-                    last14dayinfectionRate++;
-            }
-            else if (person->IsImmune(nullptr))
-                totalImmune++;
-    		
-    	}
-        for (auto poly : (*area->GetPolygons()))
-        {
-            for (auto cord : *(poly.GetCoordinates()))
-            {
-                if (maxNorthing == 0 || maxEasting == 0)
-                {
-                    minNorthing = maxNorthing = cord.Northing();
-                    minEasting = maxEasting = cord.Easting();
-                	
-                }
+    for (auto* area : *_areas)
+        for (auto poly : *area->GetPolygons())
+	        for (auto cord : *poly.GetCoordinates())
+	        {
+                if (cord.Easting() < MIN_EASTING) continue;
+		        if (_maxNorthing < 1 || _maxEasting < 1)
+		        {
+			        _minNorthing = _maxNorthing = cord.Northing();
+			        _minEasting = _maxEasting = cord.Easting();
+		        }
 
-                if (cord.Northing() < minNorthing) minNorthing = cord.Northing();
-                if (cord.Northing() > maxNorthing) maxNorthing = cord.Northing();
-                if (cord.Easting() < minEasting) minEasting = cord.Easting();
-                if (cord.Easting() > maxEasting) maxEasting = cord.Easting();
-            }
+		        if (cord.Northing() < _minNorthing) _minNorthing = cord.Northing();
+		        if (cord.Northing() > _maxNorthing) _maxNorthing = cord.Northing();
+		        if (cord.Easting() < _minEasting) _minEasting = cord.Easting();
+		        if (cord.Easting() > _maxEasting) _maxEasting = cord.Easting();
+	        }
+}
 
-        }
-    }
+void MapPlotter::PlotMap(BLContext& pContext, BLPoint pOrigin, BLSize pSize, boost::gregorian::date pDate, std::function<void(SmallArea&, BLContext&)> pApplyAreaStyle) const
+{
+	const auto rawWidth = _maxEasting - _minEasting;
+	const auto rawHeight = _maxNorthing - _minNorthing;
+	const auto scale = rawWidth/pSize.w > rawHeight/pSize.h ? rawWidth / pSize.w : rawHeight / pSize.h;
+    const auto height = rawHeight / scale;
 
 
-    auto scale = 250;
-    auto width = (maxEasting - minEasting) / scale;
-    auto height = (maxNorthing - minNorthing) / scale;
-    BLImage img(static_cast<int>(width), static_cast<int>(height), BL_FORMAT_PRGB32);
-    BLContext ctx(img);
-    ctx.setCompOp(BL_COMP_OP_SRC_COPY);
-    ctx.fillAll();
-    BLRgba32 color(245, 193, 137);
+	const BLRgba32 color(245, 193, 137);
+    pContext.setFillStyle(color);
+    pContext.fillRect(pOrigin.x, pOrigin.y, pSize.w, pSize.h);
 
-    ctx.setFillStyle(color);
-    ctx.fillRect(0, 0, width, height);
-
-
-    for (auto area : (*_areas))
+    for (auto* area : (*_areas))
     {
         for (auto poly : *(area->GetPolygons()))
         {
-           // BLPath path;
             BLArray<BLPoint> coords;
         	
             auto foundBad = false;
             for (auto cord : *(poly.GetCoordinates()))
             {
-                if ((cord.Easting() - minEasting) / scale < 100)
+                if (cord.Easting() < MIN_EASTING) {
+                    std::cout<< " " << std::to_string(cord.Easting())<< " " <<  std::to_string(_minEasting+scale*100);
                     foundBad = true;
-            	coords.append(BLPoint((cord.Easting() - minEasting) / scale, height - (cord.Northing() - minNorthing) / scale));
+                }
+            	coords.append(BLPoint((cord.Easting() - _minEasting) / scale + pOrigin.x, height - (cord.Northing() - _minNorthing) / scale + pOrigin.y));
             }
 
             if (!foundBad) {
                 
-                ctx.setCompOp(BL_COMP_OP_SRC_OVER);
-                pApplyAreaStyle(*area, ctx);
+                pContext.setCompOp(BL_COMP_OP_SRC_OVER);
+                pApplyAreaStyle(*area, pContext);
                 
-                ctx.fillPolygon(coords.view());
+                pContext.fillPolygon(coords.view());
             }
         }
     }
-
-
-    std::string infectedText = "Total Infected On Day " + std::to_string(totalInfected);
-    auto per100krate = (double)last14dayinfectionRate / (static_cast<double>(totalPopulation) / 100000);
-    std::string rateText = "National 14 Per 100k rate on "+ std::to_string(pDate.day())+"/"+ std::to_string(pDate.month())+"/"+ std::to_string(pDate.year())+" is " + std::to_string(static_cast<int>(per100krate));
-    std::string immuneText = "Total Recovered Or Dead = " + std::to_string(totalImmune);
-	
-    ctx.fillUtf8Text(BLPoint(5, 35), _font, rateText.c_str());
-    ctx.fillUtf8Text(BLPoint(5, 70), _font, infectedText.c_str());
-    ctx.fillUtf8Text(BLPoint(5, 100), _font, immuneText.c_str());
-    ctx.end();
-    BLImageData data;
-    img.getData(&data);
-
-    auto rows = static_cast<void**>(malloc(sizeof(void*) * data.size.h));
-    auto dataPointer = (char *)data.pixelData;
-    for (auto i = 0; i < data.size.h; i++, dataPointer += data.stride)
-        rows[i] = dataPointer;
-    write_png_file(const_cast<char*>(pOutputFile.c_str()), static_cast<int>(width), static_cast<int>(height), rows);
 }

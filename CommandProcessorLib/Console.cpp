@@ -64,7 +64,7 @@ bool Console::WriteLine(const wchar_t* pMsg, ...)
 
 	buffer[n] = 0;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	auto converted = converter.to_bytes(buffer);
+	const auto converted = converter.to_bytes(buffer);
 	
 	return Write(static_cast<int>(converted.length()), (PBYTE)(converted.c_str()));
 

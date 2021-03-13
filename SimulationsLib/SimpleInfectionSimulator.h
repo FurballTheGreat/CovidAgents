@@ -45,5 +45,7 @@ public:
 		DWORD pMaxLocalContacts);
 
 	DWORD GetTotalCurrentlyInfected() const;
+
+	PopulationSim& GetPopulation() const;
 };
 

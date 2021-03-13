@@ -13,25 +13,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
-#include <functional>
-#include <string>
-#include <vector>
 #include <blend2d.h>
-#include <boost/date_time/gregorian/greg_date.hpp>
-class DrawingFont;
-class SmallArea;
+#include <string>
 
-class MapPlotter
+class DrawingFont
 {
-private:
-	std::vector<SmallArea*>* _areas;
-    double _minNorthing = 0;
-	double _maxNorthing = 0;
-    double _minEasting = 0;
-	double _maxEasting = 0;
+	BLFontData _fontData;
+	BLFontFace _fontFace;
+	BLFont _font;
+	double _size;
 public:
-	MapPlotter(std::vector<SmallArea*>* pAreas);
+	DrawingFont(std::string pFontFileName, double pSize);
 
-	void PlotMap(BLContext& pContext, BLPoint pOrigin, BLSize pSize, boost::gregorian::date pDate, std::function<void(SmallArea&, BLContext&)> pApplyAreaStyle) const;
+	void DrawUtf8(BLContext& pContext, BLPoint pWhere, std::string pText) const;
+
+	double GetSize() const;
 };
 

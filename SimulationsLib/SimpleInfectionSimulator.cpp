@@ -192,3 +192,8 @@ DWORD SimpleInfectionSimulator::GetTotalCurrentlyInfected() const
 {
 	return static_cast<DWORD>(_infected.size());
 }
+
+PopulationSim& SimpleInfectionSimulator::GetPopulation() const
+{
+	return _population;
+}

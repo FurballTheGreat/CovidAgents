@@ -33,10 +33,23 @@
     </Font>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DayInfoPlotter.cpp" />
+    <ClCompile Include="DayStatsCollector.cpp" />
+    <ClCompile Include="DrawingCanvas.cpp" />
+    <ClCompile Include="DrawingFont.cpp" />
+    <ClCompile Include="FFMpegH264Writer.cpp" />
     <ClCompile Include="MapPlotter.cpp" />
+    <ClCompile Include="PngWriter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DayInfoPlotter.h" />
+    <ClInclude Include="DayStatsCollector.h" />
+    <ClInclude Include="DrawingCanvas.h" />
+    <ClInclude Include="DrawingFont.h" />
+    <ClInclude Include="FFMpegH264Writer.h" />
+    <ClInclude Include="ICanvasWriter.h" />
     <ClInclude Include="MapPlotter.h" />
+    <ClInclude Include="PngWriter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -107,7 +120,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Common;$(SolutionDir)SharedLib;$(SolutionDir)PopulationSimulationLib;$(SolutionDir)..\blend2d\blend2d\src;$(SolutionDir)..\geographiclib-code\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Common;$(SolutionDir)SharedLib;$(SolutionDir)PopulationSimulationLib;$(SolutionDir)..\blend2d\blend2d\src;$(SolutionDir)..\geographiclib-code\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

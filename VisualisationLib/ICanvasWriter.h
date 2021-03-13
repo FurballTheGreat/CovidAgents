@@ -13,25 +13,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
-#include <functional>
-#include <string>
-#include <vector>
-#include <blend2d.h>
-#include <boost/date_time/gregorian/greg_date.hpp>
-class DrawingFont;
-class SmallArea;
+#include "BasePopulationContainer.h"
 
-class MapPlotter
+class ICanvasWriter
 {
-private:
-	std::vector<SmallArea*>* _areas;
-    double _minNorthing = 0;
-	double _maxNorthing = 0;
-    double _minEasting = 0;
-	double _maxEasting = 0;
 public:
-	MapPlotter(std::vector<SmallArea*>* pAreas);
-
-	void PlotMap(BLContext& pContext, BLPoint pOrigin, BLSize pSize, boost::gregorian::date pDate, std::function<void(SmallArea&, BLContext&)> pApplyAreaStyle) const;
+	virtual ~ICanvasWriter() {  }
+	virtual void SaveFrame(DWORD pLines, DWORD pStride, void* pLinePointers) = 0;		
 };
-
