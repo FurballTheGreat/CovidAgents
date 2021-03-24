@@ -10,6 +10,8 @@ add_library (
 	"DayInfoPlotter.cpp"
 	"DayStatsCollector.h" 
 	"DayStatsCollector.cpp"
+	"CSVDayStatsWriter.h" 
+	"CSVDayStatsWriter.cpp"
 	"DrawingCanvas.h" 
 	"DrawingCanvas.cpp"
 	"DrawingFont.h" 
