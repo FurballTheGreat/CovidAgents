@@ -167,7 +167,7 @@ PopulationSim::PopulationSim(RandomSource* pRandom, Population* pPopulation, Sma
 
 
 	for (auto* county : (*_smallAreas->GetCountyCodes()))
-		_counties.push_back(new County(county->GetName()));
+		_counties.push_back(new County(county->GetName(), county->GetCode()));
 
 	for (auto* region : (*_smallAreas->GetRegionCodes()))
 		_regions.push_back(new Region(region->GetName()));

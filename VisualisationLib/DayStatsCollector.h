@@ -21,7 +21,6 @@ class DayStats
 {
 	DWORD _totalPopulation = 0;
 	DWORD _currentlyInfected = 0;
-	DWORD _totalInfected = 0;
 	DWORD _14dayInfectedRate = 0;
 	DWORD _infectedLast24Hrs = 0;
 	DWORD _totalRecovered = 0;
@@ -32,13 +31,11 @@ public:
 		DWORD pTotalPopulation,
 		DWORD pCurrentlyInfected,
 		DWORD pInfectedLast24hrs,
-		DWORD pTotalInfected,
 		DWORD p14dayInfectedRate,
 		DWORD pTotalRecovered);
 	DWORD GetTotalPopulation() const;
 	DWORD GetCurrentlyInfected() const;
 	DWORD GetInfectedLast24Hrs() const;
-	DWORD GetTotalInfected() const;
 	DWORD Get14dayInfectedRate() const;
 	DWORD GetTotalRecovered() const;
 };
@@ -60,19 +57,21 @@ public:
 	void ProcessArea(SmallArea& pArea);
 	void ResetDay();
 	
-	DayStats& GetStats();	
+	const DayStats& GetStats();	
 };
 
 class DayStatsCollector
 {
-	AreaListStatsGenerator _nationalStats ;
-	const PopulationSim& _population;
+	AreaListStatsGenerator _nationalStats;
+	std::map<County*, AreaListStatsGenerator*> _countyStats;
+	PopulationSim& _population;
 public:
-	DayStatsCollector(const PopulationSim& pPopulation);
-
+	DayStatsCollector(PopulationSim& pPopulation);
+	~DayStatsCollector();
 	void Refresh();
 
-	DayStats& GetNationalStats();
+	const DayStats& GetNationalStats();
 	boost::gregorian::date GetDate() const;
+	const DayStats& GetCountyStats(County* pCounty);
 };
 

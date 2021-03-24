@@ -28,8 +28,9 @@ private:
 	std::vector<LocalElectoralArea*> _area;
 	Region* _region;
 	SubRegion* _subRegion;
+	std::wstring _code;
 public:
-	County(std::wstring pName);
+	County(std::wstring pName, std::wstring pCode);
 	Region* GetRegion() const;
 	SubRegion* GetSubRegion() const;
 	void SetRegion(Region* pRegion);
@@ -37,5 +38,6 @@ public:
 	std::vector<LocalElectoralArea*>* GetAreas();
 	std::vector<SmallArea*> GetSmallAreas();
 	DWORD GetImmune() ;
+	std::wstring GetCode() const;
 };
 

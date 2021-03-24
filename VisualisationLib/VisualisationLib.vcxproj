@@ -33,6 +33,7 @@
     </Font>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CSVDayStatsWriter.cpp" />
     <ClCompile Include="DayInfoPlotter.cpp" />
     <ClCompile Include="DayStatsCollector.cpp" />
     <ClCompile Include="DrawingCanvas.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="PngWriter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CSVDayStatsWriter.h" />
     <ClInclude Include="DayInfoPlotter.h" />
     <ClInclude Include="DayStatsCollector.h" />
     <ClInclude Include="DrawingCanvas.h" />

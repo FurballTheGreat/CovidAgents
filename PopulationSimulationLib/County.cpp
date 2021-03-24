@@ -19,7 +19,7 @@
 #include "Person.h"
 #include "SmallArea.h"
 
-County::County(std::wstring pName) : BasePopulationContainer(pName)
+County::County(std::wstring pName, std::wstring pCode) : BasePopulationContainer(pName), _code(std::move(pCode))
 {
 }
 
@@ -67,4 +67,9 @@ DWORD County::GetImmune()
 		if (person->IsImmune(nullptr))
 			result++;
 	return result;
+}
+
+std::wstring County::GetCode() const
+{
+	return _code;
 }

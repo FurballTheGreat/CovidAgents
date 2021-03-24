@@ -34,14 +34,14 @@
 #include "StandardVariant.h"
 #include "Variant.h"
 
-#include <boost/python.hpp>
+//#include <boost/python.hpp>
 
 
 #include "DrawingCanvas.h"
 #include "FFMpegH264Writer.h"
 
 using namespace boost::gregorian;
-using namespace boost::python;
+//using namespace boost::python;
 using namespace GeographicLib;
 
 

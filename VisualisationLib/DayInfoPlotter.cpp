@@ -28,7 +28,6 @@ void DayInfoPlotter::Plot(BLContext& pContext, BLPoint& pOrigin, BLSize& pSize, 
 	const std::string infectedText = "Total Infected On Day " + std::to_string(pStats.GetNationalStats().GetInfectedLast24Hrs());
 	const std::string rateText = "National 14 Per 100k rate on " + std::to_string(pStats.GetDate().day()) + "/" + std::to_string(pStats.GetDate().month()) + "/" + std::to_string(pStats.GetDate().year()) + " is " + std::to_string(pStats.GetNationalStats().Get14dayInfectedRate());
 	const std::string recoveredText = "Total Recovered = " + std::to_string(pStats.GetNationalStats().GetTotalRecovered());
-	const std::string totalEverText = "Total Infected = " + std::to_string(pStats.GetNationalStats().GetTotalInfected());
 	const std::string totalCurrentlyText = "Total Currently Infected = " + std::to_string(pStats.GetNationalStats().GetCurrentlyInfected());
 	const std::string totalPopulation = "Population = " + std::to_string(pStats.GetNationalStats().GetTotalPopulation());
 
@@ -36,9 +35,8 @@ void DayInfoPlotter::Plot(BLContext& pContext, BLPoint& pOrigin, BLSize& pSize, 
     pContext.setFillStyle(BLRgba32(200,200,255));
     _font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 1),rateText);
     _font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 2), infectedText);
-    _font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 3), totalEverText);
-	_font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 4), totalCurrentlyText);
-	_font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 5), recoveredText);
+	_font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 3), totalCurrentlyText);
+	_font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 4), recoveredText);
   //  pContext.postRotate(90);
-	_font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 6), totalPopulation);
+	_font.DrawUtf8(pContext, BLPoint(pOrigin.x + 5, pOrigin.y + (_font.GetSize() + 5) * 5), totalPopulation);
 }

@@ -52,7 +52,7 @@ Infection* Infection::ProcessContact(RandomSource& pRandom, Person* pSourcePerso
 		return nullptr;
 	if (daysInfected < _infectiousnessByDay.size()) {
 		auto random = pRandom.Get<DWORD>( 1000);
-		if (random<= _infectiousnessByDay[daysInfected]*10 && pContact->GetInfection() == nullptr)
+		if (random<= _infectiousnessByDay[daysInfected]*100 && pContact->GetInfection() == nullptr)
 		{
 			auto* infection = new Infection(pRandom, _variant, _populationSim);
 			pContact->SetInfection(infection);

@@ -13,26 +13,32 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "DayStatsCollector.h"
+
+#include <iostream>
+
+
+
+#include "County.h"
+#include "LocalElectoralArea.h"
 #include "Person.h"
 #include "SmallArea.h"
 #include "SmallAreas.h"
 
 DayStats::DayStats()
 {
+	
 }
 
 DayStats::DayStats(
 	DWORD pTotalPopulation,
 	DWORD pCurrentlyInfected, 
 	DWORD pInfectedLast24hrs, 
-	DWORD pTotalInfected, 
 	DWORD p14dayInfectedRate,
 	DWORD pTotalRecovered) :
-	_currentlyInfected(pCurrentlyInfected),	
-	_totalInfected(pTotalInfected),
 	_totalPopulation(pTotalPopulation),
-	_infectedLast24Hrs(pInfectedLast24hrs),
+	_currentlyInfected(pCurrentlyInfected),
 	_14dayInfectedRate(p14dayInfectedRate),
+	_infectedLast24Hrs(pInfectedLast24hrs),
 	_totalRecovered(pTotalRecovered)
 {
 }
@@ -52,10 +58,6 @@ DWORD DayStats::GetInfectedLast24Hrs() const
 	return _infectedLast24Hrs;
 }
 
-DWORD DayStats::GetTotalInfected() const
-{
-	return _totalInfected;
-}
 
 DWORD DayStats::Get14dayInfectedRate() const
 {
@@ -101,14 +103,13 @@ void AreaListStatsGenerator::ResetDay()
 	_calculated = false;
 }
 
-DayStats& AreaListStatsGenerator::GetStats()
+const DayStats& AreaListStatsGenerator::GetStats()
 {
 	if (!_calculated) {
 		_currentStats = DayStats(
 			_totalPopulation, 
 			_totalCurrentlyInfected, 
 			_totalInfectedLast24hrs, 
-			_totalEverInfected, 
 			static_cast<DWORD>(static_cast<double>(_totalInfectedInLast14Days) /
 				(static_cast<double>(_totalPopulation) / 100000.0)),
 			_totalRecovered);
@@ -117,23 +118,44 @@ DayStats& AreaListStatsGenerator::GetStats()
 	return _currentStats;
 }
 
-DayStatsCollector::DayStatsCollector(const PopulationSim& pPopulation) : _population(pPopulation)
+DayStatsCollector::DayStatsCollector(PopulationSim& pPopulation) : _population(pPopulation)
 {
 	_nationalStats = AreaListStatsGenerator([&](SmallArea& pArea)
 		{
 			return true;
 		});
+
+	for(auto* county : *(_population.GetCounties()))
+	{
+		_countyStats.insert(std::make_pair(county, new AreaListStatsGenerator([county](SmallArea& pArea)
+			{
+				
+				auto result =  pArea.GetElectoralArea()->GetCounty()->GetCode() == county->GetCode();
+//				std::wcout << pArea.GetElectoralArea()->GetCounty()->GetCode() << " " << county->GetCode() << " " << result << "\r\n";
+				return result;
+			})));
+	}
+}
+
+DayStatsCollector::~DayStatsCollector()
+{
+	for (auto stat : _countyStats)
+		delete stat.second;
 }
 
 void DayStatsCollector::Refresh()
 {
 	_nationalStats.ResetDay();
-    for (auto* area : *_population.GetSmallAreas()->GetAreas())
-	    _nationalStats.ProcessArea(*area);
-	
+	for (auto countyStat : _countyStats)
+		countyStat.second->ResetDay();
+	for (auto* area : *_population.GetSmallAreas()->GetAreas()) {
+		_nationalStats.ProcessArea(*area);
+		for (auto countyStat : _countyStats)
+			countyStat.second->ProcessArea(*area);
+	}	
 }
 
-DayStats& DayStatsCollector::GetNationalStats()
+const DayStats& DayStatsCollector::GetNationalStats()
 {
 	return _nationalStats.GetStats();
 }
@@ -141,4 +163,9 @@ DayStats& DayStatsCollector::GetNationalStats()
 boost::gregorian::date DayStatsCollector::GetDate() const
 {
 	return _population.GetDate();
+}
+
+const DayStats& DayStatsCollector::GetCountyStats(County* pCounty)
+{
+	return _countyStats.at(pCounty)->GetStats();
 }

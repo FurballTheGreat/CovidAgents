@@ -21,6 +21,7 @@
 
 
 #include "County.h"
+#include "CSVDayStatsWriter.h"
 #include "DayInfoPlotter.h"
 #include "DayStatsCollector.h"
 #include "DrawingCanvas.h"
@@ -105,6 +106,7 @@ void SimpleSimulationCommand::ProcessCommand(Console* pConsole, ParsedCommandLin
 	auto infoPlotter = DayInfoPlotter(font);
 	auto dayStats = DayStatsCollector(_simulation->GetPopulation());
 	auto h264Writer = new FFMpegH264Writer("out.mp4", canvas.GetSize(), 30, 2000000);
+	auto csvStatsWriter = new CSVDayStatsWriter(*_sim, "out.csv");
 	for (DWORD day = 0; day < static_cast<DWORD>(days); day++)
 	{
 		auto begin = clock();
@@ -156,7 +158,7 @@ void SimpleSimulationCommand::ProcessCommand(Console* pConsole, ParsedCommandLin
 	//	canvas.WriteTo(writer);
 		for(DWORD x = 0; x < 10; x++)
 			canvas.WriteTo(*h264Writer);
-	
+		csvStatsWriter->WriteDay(dayStats);
 		auto end = clock();
 		auto time_spent = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 		std::cout << "Saved " << fileName << " in " << time_spent << "s\r\n";
@@ -169,6 +171,7 @@ void SimpleSimulationCommand::ProcessCommand(Console* pConsole, ParsedCommandLin
 	}
 
 	delete h264Writer;
+	delete csvStatsWriter;
 }
 
 CommandInfo SimpleSimulationCommand::GetInfo()
